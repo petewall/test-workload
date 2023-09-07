@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test-workload
+  name: test-workload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-workload
+  template:
+    metadata:
+      labels:
+        app: test-workload
+    spec:
+      containers:
+      - name: test-workload
+        image: petewall/test-workload
+        ports:
+        - name: http
+          containerPort: 3000
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "250m"
+          limits:
+            memory: "320Mi"
+            cpu: "500m"
+      volumes:
+      - name: config
+        configMap:
+          name: test-workload-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: test-workload
+  name: test-workload
+spec:
+  type: LoadBalancer
+  selector:
+    app: test-workload
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-workload-config
+data:
+  config.yaml: |
+    errorRate: 10
+    cpu:
+      minPrimesCalculated: 10000000
+      maxPrimesCalculated: 11000000
+    memory:
+      usage: 300000

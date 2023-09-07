@@ -1,0 +1,6 @@
+errorRate: 10
+cpu:
+  minPrimesCalculated: 10000000
+  maxPrimesCalculated: 11000000
+memory:
+  usage: 1500
